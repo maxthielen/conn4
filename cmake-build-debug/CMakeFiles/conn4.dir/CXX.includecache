@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../lib/include/board.h
+vector
+-
+
+/home/max/Desktop/Saxion/Y2/Q2/APC/conn4/repo/conn4/lib/include/board.h
+vector
+-
+
+/home/max/Desktop/Saxion/Y2/Q2/APC/conn4/repo/conn4/lib/src/board.cpp
+iostream
+-
+../include/board.h
+/home/max/Desktop/Saxion/Y2/Q2/APC/conn4/repo/conn4/lib/include/board.h
+
+/home/max/Desktop/Saxion/Y2/Q2/APC/conn4/repo/conn4/main.cpp
+iostream
+-
+climits
+-
+board.h
+/home/max/Desktop/Saxion/Y2/Q2/APC/conn4/repo/conn4/board.h
+

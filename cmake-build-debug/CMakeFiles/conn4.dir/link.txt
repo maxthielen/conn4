@@ -1,0 +1,1 @@
+/bin/clang++ -g CMakeFiles/conn4.dir/main.cpp.o CMakeFiles/conn4.dir/lib/src/board.cpp.o -o conn4 
