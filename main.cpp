@@ -1,96 +1,76 @@
 #include <iostream>
 #include <climits>
+#include <cassert>
 #include "board.h"
 
-int minimax(lib::board node, int depth, bool maximizing){
-    if(depth==0 || node.gameOver()){
-        int value;
-        if(node.isWin(node.get0())) value = 1; // win
-        else if(node.isWin(node.get1())) value = -1; // loss
-        else if(node.isDraw()) value = 0; // tie
-        else value = 0; // max depth reached
-        std::cout << "000 Depth: " << depth << " Score: " << value << std::endl;
-        return value;
-    }
-    if(maximizing){
-        int value = -INT_MAX;
-        auto moves = node.listMoves();
-        for(int move : moves) {
-            node.makeMove(move);
-            value = std::max(value, minimax(node, depth-1, false));
-            std::cout << "+++ Previously: ";
-            for(auto m:node.moves) std::cout << m << " ";
-            std::cout << std::endl;
-            std::cout << "+++ Depth: " << depth << " Move: " << move << " Score: " << value << std::endl;
-            if(node.isWin(node.get0())) {
-                std::cout << "+++ I win. :P" << std::endl;
-                std::cout << "Game Over: " << node.gameOver() << std::endl;
-            }
-            if(node.isWin(node.get1())) {
-                std::cout << "+++ Player wins. :(" << std::endl;
-                std::cout << "Game Over: " << node.gameOver() << std::endl;
-            }
-            node.undoMove();
-        }
 
-        return value;
-    }
-    else{
-        int value = INT_MAX;
-        auto moves = node.listMoves();
-        for(int move : moves) {
-            node.makeMove(move);
-            value = std::min(value, minimax(node, depth-1, true));
-            std::cout << "--- Previously: ";
-            for(auto m:node.moves) std::cout << m << " ";
-            std::cout << std::endl;
-            std::cout << "--- Depth: " << depth << " Move: " << move << " Score: " << value << std::endl;
-            if(node.isWin(node.get0())) {
-                std::cout << "+++ I win. :P" << std::endl;
-                std::cout << "Game Over: " << node.gameOver() << std::endl;
-            }
-            if(node.isWin(node.get1())) {
-                std::cout << "+++ Player wins. :(" << std::endl;
-                std::cout << "Game Over: " << node.gameOver() << std::endl;
-            }
-            node.undoMove();
+
+
+int negamax(lib::board node, int alpha, int beta, int depth) {
+    assert(alpha < beta);
+
+    if(node.gameOver()) {
+        if (node.isDraw()) {
+            // check for draw game
+//            std::cout << "Player: " << node.getTurn() <<
+//            " Draw" << '\n';
+            return 0;
         }
-        return value;
+        if (!node.getTurn()) {
+            if (node.isWin(node.get0())) {
+//                std::cout << "Score: " << ((42 - node.counter) / 2) <<
+//                " Player: " << node.getTurn() <<
+//                " Win!" << '\n';
+                return (42 - node.counter) / 2;
+            }
+        } else {
+            if (node.isWin(node.get1())) {
+//                std::cout << "Score: " << ((42 - node.counter) / 2) <<
+//                " Player: " << node.getTurn() <<
+//                " Win!" << '\n';
+                return (42 - node.counter) / 2;
+            }
+        }
     }
+
+    int max = (42 - node.counter) / 2;
+
+    if(beta > max) {
+        beta = max;                     // there is no need to keep beta above our max possible score.
+        if(alpha >= beta) return beta;  // prune the exploration if the [alpha;beta] window is empty.
+    }
+
+    for(int move : node.listMoves()) {
+
+        node.makeMove(move);              // It's opponent turn in P2 position after current player plays x column.
+
+        int score = -negamax(node, -beta, -alpha, depth + 1); // If current player plays col x, his score will be the opposite of opponent's score after playing col x
+
+//        std::cout << " Depth: " << depth <<
+//        " Move: " << move <<
+//        " Score: " << score <<
+//        " Alpha: " << alpha <<
+//        " Beta: " << beta <<
+//        " Player: " << node.getTurn() << std::endl;
+
+        node.undoMove();
+        if(score >= beta){/* std::cout << "Pruned" << '\n';*/ return score; } // prune the exploration if we find a possible move better than what we were looking for.
+        if(score > alpha) alpha = score; // reduce the [alpha;beta] window for next exploration, as we only
+    }
+
+    return alpha;
+
 }
 
-//int negamax(lib::board node) {
-//    node.counter++; // increment counter of explored nodes
-//
-//    if(node.isDraw()) // check for draw game
-//        return 0;
-//
-//    for(int move : node.listMoves()) {
-//        node.makeMove(move); // check if current player can win next move
-//        if (node.isWin(node.get0()))
-//            return (43 - node.counter) / 2;
-//    }
-//
-//    int bestScore = -42; // init the best possible score with a lower bound of score.
-//
-//    for(int move : node.listMoves()) {
-//
-//        node.makeMove(move);              // It's opponent turn in P2 position after current player plays x column.
-//        int score = -negamax(node); // If current player plays col x, his score will be the opposite of opponent's score after playing col x
-//        if (score > bestScore) bestScore = score; // keep track of best possible score so far.
-//    }
-//
-//    return bestScore;
-//
-//}
-
 int findBestMove(lib::board board){
+    int depth = 0;
     int bestValue = -INT_MAX;
     int bestMove{};
     auto moves = board.listMoves();
     for(int move : moves) {
         board.makeMove(move);
-        int value = std::max(bestValue, minimax(board, 6, false));
+        std::cout << move << '\n';
+        int value = std::max(bestValue, negamax(board, -1, 1, depth));
         if(bestValue < value){
             bestMove = move;
             bestValue = value;
