@@ -6,9 +6,9 @@ int minimax(lib::board node, int depth, bool maximizing){
     if(depth==0 || node.gameOver()){
         int value;
         if(node.isWin(node.get0())) value = 1; // win
-        else if(node.isWin(node.get1())) value = 2; // loss
+        else if(node.isWin(node.get1())) value = -1; // loss
         else if(node.isDraw()) value = 0; // tie
-        else value = -2; // max depth reached
+        else value = 0; // max depth reached
         std::cout << "000 Depth: " << depth << " Score: " << value << std::endl;
         return value;
     }
@@ -36,11 +36,11 @@ int minimax(lib::board node, int depth, bool maximizing){
         return value;
     }
     else{
-        int value = -INT_MAX;
+        int value = INT_MAX;
         auto moves = node.listMoves();
         for(int move : moves) {
             node.makeMove(move);
-            value = std::max(value, minimax(node, depth-1, true));
+            value = std::min(value, minimax(node, depth-1, true));
             std::cout << "--- Previously: ";
             for(auto m:node.moves) std::cout << m << " ";
             std::cout << std::endl;
@@ -59,13 +59,38 @@ int minimax(lib::board node, int depth, bool maximizing){
     }
 }
 
+//int negamax(lib::board node) {
+//    node.counter++; // increment counter of explored nodes
+//
+//    if(node.isDraw()) // check for draw game
+//        return 0;
+//
+//    for(int move : node.listMoves()) {
+//        node.makeMove(move); // check if current player can win next move
+//        if (node.isWin(node.get0()))
+//            return (43 - node.counter) / 2;
+//    }
+//
+//    int bestScore = -42; // init the best possible score with a lower bound of score.
+//
+//    for(int move : node.listMoves()) {
+//
+//        node.makeMove(move);              // It's opponent turn in P2 position after current player plays x column.
+//        int score = -negamax(node); // If current player plays col x, his score will be the opposite of opponent's score after playing col x
+//        if (score > bestScore) bestScore = score; // keep track of best possible score so far.
+//    }
+//
+//    return bestScore;
+//
+//}
+
 int findBestMove(lib::board board){
     int bestValue = -INT_MAX;
     int bestMove{};
     auto moves = board.listMoves();
     for(int move : moves) {
         board.makeMove(move);
-        int value = std::max(bestValue, minimax(board, 2, false));
+        int value = std::max(bestValue, minimax(board, 6, false));
         if(bestValue < value){
             bestMove = move;
             bestValue = value;
