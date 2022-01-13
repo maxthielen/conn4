@@ -36,13 +36,16 @@ namespace lib{
         return false;
     }
 
-    bool board::isLoss() const{
-        int directions[] = {1, 7, 6, 8};
-        long bb;
-        for(int dir : directions){
-            bb = bitboards[!(counter & 1)] & (bitboards[!(counter & 1)] >> dir);
-            if((bb & (bb >> (2*dir))) != 0) return true;
-        }
+    bool board::isConnect3(long bitboard, int col) const{
+        long move = 1L << height[col];
+        if(bitboard & (move >> 6))
+        return false;
+    }
+    bool board::isConnect2(long bitboard) const{
+        if ((bitboard & (bitboard >> 6)) != 0) return true; // diagonal \.
+        if ((bitboard & (bitboard >> 8)) != 0) return true; // diagonal /.
+        if ((bitboard & (bitboard >> 7)) != 0) return true; // horizontal
+        if ((bitboard & (bitboard >> 1)) != 0) return true; // vertical
         return false;
     }
 

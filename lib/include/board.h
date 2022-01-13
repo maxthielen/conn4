@@ -22,7 +22,8 @@ namespace lib{
         [[nodiscard]] long get1() const{ return bitboards[1]; }
 
         [[nodiscard]] bool isWin(long bitboard) const;
-        [[nodiscard]] bool isLoss() const;
+        [[nodiscard]] bool isConnect3(long bitboard) const;
+        [[nodiscard]] bool isConnect2(long bitboard) const;
         [[nodiscard]] bool isDraw() const{ return listMoves().empty(); }
         [[nodiscard]] bool gameOver() const { return (isWin(bitboards[0]) || isWin(bitboards[1]) || isDraw()); }
         [[nodiscard]] bool getTurn() const{ return (counter & 1); };
