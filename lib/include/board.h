@@ -21,10 +21,10 @@ namespace lib{
         [[nodiscard]] long get0() const{ return bitboards[0]; }
         [[nodiscard]] long get1() const{ return bitboards[1]; }
 
-        [[nodiscard]] bool isWin(long bitboard) const;
+        [[nodiscard]] bool isWin() const;
         [[nodiscard]] bool isLoss() const;
         [[nodiscard]] bool isDraw() const{ return listMoves().empty(); }
-        [[nodiscard]] bool gameOver() const { return (isWin(bitboards[0]) || isWin(bitboards[1]) || isDraw()); }
+        [[nodiscard]] bool gameOver() const { return (isWin() || isLoss() || isDraw()); }
         [[nodiscard]] bool getTurn() const{ return (counter & 1); };
         std::vector<int> moves; //stores all moves made
         int counter; //counts the number of moves made

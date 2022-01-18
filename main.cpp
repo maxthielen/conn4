@@ -3,10 +3,10 @@
 #include <cassert>
 #include "board.h"
 #include <array>
+#include <ctime>
 
 
-
-int negamax(lib::board node, int alpha, int beta, int depth, int color) {
+int negamax(lib::board node, int alpha, int beta, int depth) {
     assert(alpha < beta);
 
     //std::cout << node.gameOver() << '\n';
@@ -19,8 +19,11 @@ int negamax(lib::board node, int alpha, int beta, int depth, int color) {
 //                      " Draw" << '\n';
             return 0;
         }
-        if (node.isWin(node.get0()) || node.isWin(node.get1())){
-            return ((42 - node.counter) / 2) * color;
+        if (node.isWin()){
+            return ((42 - node.counter) / 2);
+        }
+        if (node.isLoss()){
+            return -((42 - node.counter) / 2);
         }
 
 //        if (!node.getTurn()) {
@@ -57,7 +60,7 @@ int negamax(lib::board node, int alpha, int beta, int depth, int color) {
         node.makeMove(move);
         // It's opponent turn in P2 position after current player plays x column.
 
-        int score = -negamax(node, -beta, -alpha, depth - 1, -color); // If current player plays col x, his score will be the opposite of opponent's score after playing col x
+        int score = -negamax(node, -beta, -alpha, depth - 1); // If current player plays col x, his score will be the opposite of opponent's score after playing col x
 
 //        std::cout << " Depth: " << depth <<
 //        " Move: " << move <<
@@ -77,15 +80,14 @@ int negamax(lib::board node, int alpha, int beta, int depth, int color) {
 
 }
 
-int findBestMove(lib::board board){
-    int depth = 14;
+int findBestMove(lib::board board, int depth){
     int bestValue = -INT_MAX;
     int bestMove{};
     auto moves = board.listMoves();
     for(int move : moves) {
         board.makeMove(move);
         std::cout << move << '\n';
-        int value = -negamax(board, -INT_MAX, INT_MAX, depth - 1, 1);
+        int value = -negamax(board, -INT_MAX, INT_MAX, depth - 1);
         if(bestValue < value){
             bestMove = move;
             bestValue = value;
@@ -99,8 +101,15 @@ int findBestMove(lib::board board){
 int main() {
     auto m_board = lib::board();
     bool menu{true};
+    int depth;
+    std::srand(std::time(nullptr));
+
+    std::cout << "Please enter the depth: ";
+    std::cin >> depth;
+    int rng = std::rand();
+
     while(menu){
-        if(m_board.getTurn()) {
+        if((m_board.getTurn() + rng) % 2) {
             m_board.print();
             int input{-1};
             do {
@@ -115,7 +124,7 @@ int main() {
                     }());
             m_board.makeMove(input);
 
-            if(m_board.isWin(m_board.get1())){
+            if(m_board.isLoss()){
                 menu = false;
                 m_board.print();
                 std::cout << "Congratulations! Nice match." << std::endl;
@@ -123,10 +132,10 @@ int main() {
         }
         else {
             std::cout << "STARTING search for move: " << m_board.counter << std::endl;
-            int move{findBestMove(m_board)};
+            int move{findBestMove(m_board, depth)};
             m_board.makeMove(move);
             std::cout << "FOUND Best Move: " << move << std::endl;
-            if(m_board.isWin(m_board.get0())){
+            if(m_board.isLoss()){
                 menu = false;
                 m_board.print();
                 std::cout << "Nice Match. Better luck next time." << std::endl;

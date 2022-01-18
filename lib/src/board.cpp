@@ -26,7 +26,8 @@ namespace lib{
         bitboards[(counter & 1)] ^= move;
     }
 
-    bool board::isWin(long bitboard) const{
+    bool board::isWin() const{
+        long bitboard = bitboards[(counter & 1)];
         int directions[] = {1, 7, 6, 8};
         long bb;
         for(int dir : directions){
@@ -37,10 +38,11 @@ namespace lib{
     }
 
     bool board::isLoss() const{
+        long bitboard = bitboards[((counter + 1) & 1)];
         int directions[] = {1, 7, 6, 8};
         long bb;
         for(int dir : directions){
-            bb = bitboards[!(counter & 1)] & (bitboards[!(counter & 1)] >> dir);
+            bb = bitboard & (bitboard >> dir);
             if((bb & (bb >> (2*dir))) != 0) return true;
         }
         return false;
