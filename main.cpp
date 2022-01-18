@@ -2,75 +2,90 @@
 #include <climits>
 #include <cassert>
 #include "board.h"
+#include <array>
 
 
 
-
-int negamax(lib::board node, int alpha, int beta, int depth) {
+int negamax(lib::board node, int alpha, int beta, int depth, int color) {
     assert(alpha < beta);
 
-    if(node.gameOver()) {
+    //std::cout << node.gameOver() << '\n';
+    if (node.gameOver() || depth == 0) {
+
         if (node.isDraw()) {
+
             // check for draw game
 //            std::cout << "Player: " << node.getTurn() <<
-//            " Draw" << '\n';
+//                      " Draw" << '\n';
             return 0;
         }
-        if (!node.getTurn()) {
-            if (node.isWin(node.get0())) {
-//                std::cout << "Score: " << ((42 - node.counter) / 2) <<
-//                " Player: " << node.getTurn() <<
-//                " Win!" << '\n';
-                return (42 - node.counter) / 2;
-            }
-        } else {
-            if (node.isWin(node.get1())) {
-//                std::cout << "Score: " << ((42 - node.counter) / 2) <<
-//                " Player: " << node.getTurn() <<
-//                " Win!" << '\n';
-                return (42 - node.counter) / 2;
-            }
+        if (node.isWin(node.get0()) || node.isWin(node.get1())){
+            return ((42 - node.counter) / 2) * color;
         }
+
+//        if (!node.getTurn()) {
+//            if (node.isWin(node.get0())) {
+//
+////                std::cout << "Score: " << ((42 - node.counter) / 2) <<
+////                          " Player: " << node.getTurn() <<
+////                          " Win!" << '\n';
+//                return (42 - node.counter) / 2;
+//            }
+//        } else {
+//            if (node.isWin(node.get1())) {
+//
+////                std::cout << "Score: " << -((42 - node.counter) / 2) <<
+////                          " Player: " << node.getTurn() <<
+////                          " Win!" << '\n';
+//                return -((42 - node.counter) / 2);
+//            }
+//        }
+
+        //std::cout << "Depth reached" << '\n';
+        return 0;
     }
+
 
     int max = (42 - node.counter) / 2;
 
-    if(beta > max) {
+    if (beta > max) {
         beta = max;                     // there is no need to keep beta above our max possible score.
-        if(alpha >= beta) return beta;  // prune the exploration if the [alpha;beta] window is empty.
+        if (alpha >= beta) return beta;  // prune the exploration if the [alpha;beta] window is empty.
     }
 
     for(int move : node.listMoves()) {
+        node.makeMove(move);
+        // It's opponent turn in P2 position after current player plays x column.
 
-        node.makeMove(move);              // It's opponent turn in P2 position after current player plays x column.
-
-        int score = -negamax(node, -beta, -alpha, depth + 1); // If current player plays col x, his score will be the opposite of opponent's score after playing col x
+        int score = -negamax(node, -beta, -alpha, depth - 1, -color); // If current player plays col x, his score will be the opposite of opponent's score after playing col x
 
 //        std::cout << " Depth: " << depth <<
 //        " Move: " << move <<
-//        " Score: " << score <<
+//        " Score: " << score[0] <<
 //        " Alpha: " << alpha <<
 //        " Beta: " << beta <<
 //        " Player: " << node.getTurn() << std::endl;
 
         node.undoMove();
-        if(score >= beta){/* std::cout << "Pruned" << '\n';*/ return score; } // prune the exploration if we find a possible move better than what we were looking for.
-        if(score > alpha) alpha = score; // reduce the [alpha;beta] window for next exploration, as we only
-    }
+        if (score >= beta) {/* std::cout << "Pruned" << '\n';*/ return score; } // prune the exploration if we find a possible move better than what we were looking for.
+        if (score > alpha) {
+            alpha = score;
+        } // reduce the [alpha;beta] window for next exploration, as we only
 
+    }
     return alpha;
 
 }
 
 int findBestMove(lib::board board){
-    int depth = 0;
+    int depth = 14;
     int bestValue = -INT_MAX;
     int bestMove{};
     auto moves = board.listMoves();
     for(int move : moves) {
         board.makeMove(move);
         std::cout << move << '\n';
-        int value = std::max(bestValue, negamax(board, -1, 1, depth));
+        int value = -negamax(board, -INT_MAX, INT_MAX, depth - 1, 1);
         if(bestValue < value){
             bestMove = move;
             bestValue = value;

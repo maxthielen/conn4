@@ -27,7 +27,7 @@ namespace lib{
         [[nodiscard]] bool gameOver() const { return (isWin(bitboards[0]) || isWin(bitboards[1]) || isDraw()); }
         [[nodiscard]] bool getTurn() const{ return (counter & 1); };
         std::vector<int> moves; //stores all moves made
-        long counter; //counts the number of moves made
+        int counter; //counts the number of moves made
 
         void print() const;
     private:
