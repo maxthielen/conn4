@@ -51,11 +51,8 @@ namespace lib{
     std::vector<int> board::listMoves() const {
         std::vector<int> valid_moves;
         long TOP = 0b1000000100000010000001000000100000010000001000000L;
-//        for(int col{0}; col<=6; col++){
-//            if((TOP & (1L << height[col])) == 0) valid_moves.push_back(col);
-//        }
-        for (int i = 0; i < 7; i++){
-            int pos = 7 / 2 + (1 - 2 * (i % 2)) * (i + 1) / 2; // initialize the column exploration order,
+        for (int i = 0; i < 7; i++){ // select columns starting from the middle to improve ab pruning (best moves are usually in the middle)
+            int pos = 7 / 2 + (1 - 2 * (i % 2)) * (i + 1) / 2;
             if((TOP & (1L << height[pos])) == 0) valid_moves.push_back(pos);
         }
         return valid_moves;
