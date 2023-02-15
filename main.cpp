@@ -13,7 +13,7 @@ int minimax(lib::board node, int depth, bool maximizing){
         return value;
     }
     if(maximizing){
-        int value = -INT_MAX;
+        
         auto moves = node.listMoves();
         for(int move : moves) {
             node.makeMove(move);
